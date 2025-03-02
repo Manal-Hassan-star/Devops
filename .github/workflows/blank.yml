@@ -1,0 +1,24 @@
+name: Deploy Web App
+on:
+push:
+branches:
+- maincodespace-humble-system-4jvxxg5gj4vg24p
+jobs:
+build-and-deploy:
+runs-on: ubuntu-latest
+steps:
+- name: Checkout Repository
+uses: actions/checkout@v2
+- name: Log in to Azure
+uses: azure/login@v1
+with:
+creds: ${{ secrets.AZURE_CREDENTIALS }}
+- name: Log in to Azure Container Registry
+run: az acr login --name webappacr
+- name: Build and Push Docker Image
+run: |
+docker build -t webappacr.azurecr.io/webapp:latest .
+docker push webappacr.azurecr.io/webapp:latest
+- name: Restart Web App
+run: az webapp restart --name webapp-service --resource-group webapp-
+resource-group
